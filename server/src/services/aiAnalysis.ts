@@ -5,7 +5,7 @@ import { z } from 'zod';
 export type AiAnalysis = {
   requestId: string;
   status: 'unavailable' | 'analysed';
-  errorCode?: 'NOT_CONFIGURED' | 'AUTHENTICATION_FAILED' | 'MODEL_NOT_FOUND' | 'RATE_LIMITED' | 'TIMEOUT' | 'NETWORK_ERROR' | 'MALFORMED_RESPONSE';
+  errorCode?: 'NOT_CONFIGURED' | 'AUTHENTICATION_FAILED' | 'MODEL_NOT_FOUND' | 'MODEL_AGREEMENT_REQUIRED' | 'RATE_LIMITED' | 'TIMEOUT' | 'NETWORK_ERROR' | 'MALFORMED_RESPONSE';
   message?: string;
   deviceCategory?: string;
   visibleObservations?: string[];
@@ -25,6 +25,9 @@ type DeviceDetails = {
 };
 
 const MODEL = env.CLOUDFLARE_AI_MODEL;
+// Llama 3.2 Vision can return 5016 until its license is accepted per account.
+// Use a vision-capable Cloudflare model that does not require that acceptance.
+const AGREEMENT_FALLBACK_MODEL = '@cf/qwen/qwen3.8-27b';
 const aiSchema = z.object({
   deviceCategory: z.string().max(100),
   visibleObservations: z.array(z.string().max(300)).max(8),
@@ -42,39 +45,78 @@ function isCloudflareConfigured() {
   return Boolean(env.CLOUDFLARE_ACCOUNT_ID && env.CLOUDFLARE_API_TOKEN);
 }
 
-function cloudflareEndpoint() {
-  return `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(env.CLOUDFLARE_ACCOUNT_ID!)}/ai/run/${MODEL}`;
+function cloudflareEndpoint(model: string) {
+  return `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(env.CLOUDFLARE_ACCOUNT_ID!)}/ai/run/${model}`;
+}
+
+function cleanModelOutput(value: string) {
+  return value
+    .trim()
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```$/, '')
+    .replace(/<think>[\s\S]*?<\/think>/gi, '')
+    .trim();
 }
 
 async function runCloudflare(prompt: string, imageDataUri?: string, timeoutMs = 20000): Promise<string> {
   if (!isCloudflareConfigured()) throw new Error('AI_NOT_CONFIGURED');
-  const response = await fetch(cloudflareEndpoint(), {
+  const run = (model: string) => fetch(cloudflareEndpoint(model), {
     method: 'POST',
     headers: { Authorization: `Bearer ${env.CLOUDFLARE_API_TOKEN}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt, ...(imageDataUri ? { image: imageDataUri } : {}), max_tokens: 1200, temperature: 0.2 }),
+    body: JSON.stringify({
+      prompt,
+      ...(imageDataUri ? { image: imageDataUri } : {}),
+      max_tokens: 1200,
+      temperature: 0.2,
+      ...(model === AGREEMENT_FALLBACK_MODEL ? { response_format: { type: 'json_object' } } : {}),
+    }),
     signal: AbortSignal.timeout(timeoutMs),
   });
-  const body = await response.json().catch(() => null) as { result?: { response?: string }; errors?: Array<{ code?: number; message?: string }> } | null;
+
+  let model = MODEL;
+  let response = await run(model);
+  let body = await response.json().catch(() => null) as {
+    result?: { response?: string; choices?: Array<{ text?: string; message?: { content?: string | Array<{ text?: string }> } }> };
+    errors?: Array<{ code?: number; message?: string }>;
+  } | null;
+  const cloudflareCode = body?.errors?.[0]?.code;
+
+  // Model 5016 is Meta's license gate, not a bad API token. Retry with Qwen
+  // instead of asking the user to accept a separate model license.
+  if (cloudflareCode === 5016 && MODEL !== AGREEMENT_FALLBACK_MODEL) {
+    console.info(JSON.stringify({ provider: 'cloudflare', model: MODEL, fallbackModel: AGREEMENT_FALLBACK_MODEL, reason: 'MODEL_AGREEMENT_REQUIRED' }));
+    model = AGREEMENT_FALLBACK_MODEL;
+    response = await run(model);
+    body = await response.json().catch(() => null) as typeof body;
+  }
+
   if (!response.ok) {
     const cloudflareCode = body?.errors?.[0]?.code;
-    const error = response.status === 401 || response.status === 403
+    const error = cloudflareCode === 5016
+      ? 'AI_MODEL_AGREEMENT_REQUIRED'
+      : response.status === 401 || (response.status === 403 && !cloudflareCode)
       ? 'AI_AUTHENTICATION_FAILED'
       : response.status === 404
         ? 'AI_MODEL_NOT_FOUND'
         : response.status === 429 || cloudflareCode === 3036
           ? 'AI_RATE_LIMITED'
           : 'AI_UNAVAILABLE';
-    console.error(JSON.stringify({ provider: 'cloudflare', model: MODEL, status: response.status, cloudflareCode }));
+    console.error(JSON.stringify({ provider: 'cloudflare', model, status: response.status, cloudflareCode }));
     throw new Error(error);
   }
-  const text = body?.result?.response;
+  const choice = body?.result?.choices?.[0];
+  const content = choice?.message?.content;
+  const text = body?.result?.response
+    ?? choice?.text
+    ?? (typeof content === 'string' ? content : content?.map((part) => part.text ?? '').join(''));
   if (typeof text !== 'string' || !text.trim()) throw new Error('AI_INVALID_RESPONSE');
-  return text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
+  return cleanModelOutput(text);
 }
 
 function configuredErrorMessage(code: string) {
   if (code === 'AI_NOT_CONFIGURED') return 'Cloudflare AI is not configured on the server yet.';
   if (code === 'AI_AUTHENTICATION_FAILED') return 'Cloudflare rejected the server credentials. Check the account ID and API token in Render.';
+  if (code === 'AI_MODEL_AGREEMENT_REQUIRED') return 'The configured Cloudflare AI model requires a license agreement. Configure a different vision model or accept its terms in Cloudflare.';
   if (code === 'AI_MODEL_NOT_FOUND') return `Cloudflare could not find the model "${MODEL}" for this account.`;
   if (code === 'AI_RATE_LIMITED') return 'Cloudflare AI quota or rate limit was reached. Try again later.';
   if (code === 'AI_INVALID_RESPONSE') return 'Cloudflare returned an invalid response. Try again with a clear device photo.';
@@ -110,6 +152,8 @@ export async function analyseDeviceImage(file: { buffer: Buffer; mimetype: strin
         ? 'AUTHENTICATION_FAILED'
         : code === 'AI_MODEL_NOT_FOUND'
           ? 'MODEL_NOT_FOUND'
+          : code === 'AI_MODEL_AGREEMENT_REQUIRED'
+            ? 'MODEL_AGREEMENT_REQUIRED'
           : code === 'AI_RATE_LIMITED'
             ? 'RATE_LIMITED'
             : error instanceof z.ZodError || error instanceof SyntaxError || code === 'AI_INVALID_RESPONSE'

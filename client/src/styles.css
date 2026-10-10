@@ -671,3 +671,24 @@ footer { border-top: 1px solid var(--border); color: var(--muted); display: flex
 .button.danger { background: #6a2634; border-color: #934355; color: #fff; }
 .button:disabled { cursor: not-allowed; opacity: .6; }
 @media (max-width: 650px) { .activity-summary-grid > a { min-height: 5rem; } }
+
+/* Detailed idea steps need room for the actual instructions and their source photos. */
+.guide-hero-visual { min-width: 0; }
+.step-card { grid-template-columns: 2.2rem minmax(125px, 150px) minmax(0, 1fr); }
+.step-visual { align-content: start; display: flex; flex-direction: column; gap: .25rem; min-width: 0; }
+.step-visual img { display: block; flex: 1 0 120px; min-height: 120px; }
+.step-copy { min-width: 0; }
+.step-card h3 { font-size: 1rem; line-height: 1.4; }
+.step-card p { font-size: .87rem; line-height: 1.65; max-width: 70ch; }
+.step-source { align-items: center; color: var(--primary); display: inline-flex; font-size: .62rem; font-weight: 700; gap: .2rem; text-decoration: none; }
+.step-source:hover { text-decoration: underline; }
+.guide-hero-visual > .step-source { margin-top: .4rem; }
+.idea-references { margin: -1rem 0 2rem; }
+.idea-references h2 { color: var(--ink); font-size: 1rem; margin: 0 0 .65rem; }
+.idea-references ul { display: grid; gap: .55rem; list-style: none; margin: 0; padding: 0; }
+.idea-references a { align-items: center; color: var(--primary); display: inline-flex; font-size: .82rem; font-weight: 700; gap: .35rem; }
+@media (max-width: 650px) {
+  .step-card { grid-template-columns: 1.8rem minmax(88px, 108px) minmax(0, 1fr); gap: .55rem; padding: .6rem; }
+  .step-visual img { flex-basis: 105px; min-height: 105px; }
+  .step-card p { font-size: .82rem; line-height: 1.55; }
+}

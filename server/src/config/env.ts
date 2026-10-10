@@ -14,7 +14,7 @@ const envSchema = z.object({
   MONGODB_DB_NAME: z.string().default('powercycle'),
   CLOUDFLARE_ACCOUNT_ID: z.string().optional(),
   CLOUDFLARE_API_TOKEN: z.string().optional(),
-  CLOUDFLARE_AI_MODEL: z.string().default('@cf/meta/llama-3.2-11b-vision-instruct'),
+  CLOUDFLARE_AI_MODEL: z.string().default('@cf/qwen/qwen3.8-27b'),
 });
 
 export const env = envSchema.parse(process.env);

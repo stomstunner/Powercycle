@@ -79,7 +79,7 @@ export const products: Product[] = productRows.map((row, index) => {
   };
 });
 
-export type IdeaStep = { id: string; position: number; title: string; description: string; image: { url: string } };
+export type IdeaStep = { id: string; position: number; title: string; description: string; image: { url: string; source?: string; alt?: string } };
 export type Idea = {
   slug: string;
   title: string;
@@ -88,7 +88,8 @@ export type Idea = {
   safetyNotes: string;
   materials: string[];
   tags: string[];
-  coverImage: { url: string };
+  coverImage: { url: string; source?: string; alt?: string };
+  references?: Array<{ label: string; url: string }>;
   steps: IdeaStep[];
 };
 
@@ -147,7 +148,7 @@ const ideaRows: IdeaRow[] = [
   ['paper-circuit-art', 'Paper Circuit-Inspired Poster', 'Draw a circuit map poster with colored paper paths instead of electrical connections.', 'easy', 'Reused cardboard, colored paper, pencil, ruler, glue stick', 'Flatten a clean piece of reused cardboard|Sketch a simple path and component symbols|Cut paper strips in different colors|Glue down the paths and labels|Add a note that it is artwork, not a working circuit', 'paper,art,beginner'],
   ['plastic-bottle-planter', 'Self-Watering Bottle Planter', 'Reuse a clean bottle as a small planter with adult help for cutting.', 'easy', 'Clean PET bottle, potting mix, cotton cord, plant, marker', 'Wash and dry the bottle|Ask an adult to cut the bottle safely|Thread cotton cord through the neck|Add soil and a small plant|Keep outdoors or on a waterproof tray and monitor water', 'plastic,garden,beginner','Do not use bottles that held chemicals; an adult must handle cutting.'],
   ['plastic-bottle-pen-stand', 'Bottle Pen Stand', 'Turn a clean bottle base into a simple stationery cup with a safe finished edge.', 'easy', 'Clean PET bottle, marker, decorative paper, tape, adult help', 'Wash and dry the bottle|Mark the desired cup height|Have an adult cut away from hands|Cover the rim with folded tape or fabric|Decorate and use for pens only', 'plastic,desk,beginner','An adult should cut the bottle; reject any cup with a sharp edge.'],
-  ['plastic-bag-weaving', 'Woven Reusable Plastic Basket', 'Weave clean, dry packaging strips into a small non-food storage basket.', 'medium', 'Clean dry bags, cardboard loom, blunt scissors, tape', 'Use only clean dry packaging|Cut broad strips with adult help|Tape strips to a cardboard loom|Weave over and under without pulling tightly|Fold edges inward and use for dry storage', 'plastic,weaving,storage','Do not use for food, heat, children or heavy items. Avoid thin crinkly bags that tear.'],
+  ['plastic-bag-weaving', 'Make a Small Storage Basket from a Bottle and Bags', 'Weave clean plastic-bag strips around a bottle frame, then add a smooth inner liner. The finished basket is useful for dry stationery or craft supplies.', 'medium', 'Clean 1–2 L drink bottle, second clean drink bottle for liner, 2 clean bags in different colours, marker, ruler, scissors', 'Choose sturdy clean bottles and bags|Mark and cut the bottle stakes|Cut the bags into continuous weaving strips|Anchor the first two weavers|Weave the first row around the bottle|Build rows and join strips neatly|Fold the rim and fit the liner|Trim ends and test the basket', 'plastic,weaving,storage','Ask an adult to cut the bottle. Use only clean drink bottles and bags, never chemical containers. The basket is for light, dry storage only; not food, heat, liquids, children or heavy items.'],
   ['plastic-bottle-self-watering', 'Bottle Drip Watering Helper', 'Make a slow-watering aid from a clean bottle for a potted plant.', 'easy', 'Clean PET bottle, adult helper, potting soil, plant', 'Wash the bottle and remove its label|Ask an adult to make a tiny hole in the cap|Fill with water and secure the cap|Turn upside down into soil without forcing it|Check water flow and plant moisture each day', 'plastic,garden,reuse','Adult supervision is required for any puncture; do not leave standing water indoors.'],
   ['cardboard-phone-stand', 'Folded Cardboard Phone Stand', 'Cut and fold reused corrugated cardboard into a lightweight phone rest.', 'easy', 'Clean corrugated cardboard, ruler, pencil, scissors, paper tape', 'Trace a wide base and angled back support|Cut cardboard with scissors on a safe surface|Fold along the marked lines|Reinforce the joints with paper tape|Test with an unplugged phone and adjust the angle', 'cardboard,phone,beginner'],
   ['earphone-external-check', 'Wired Earphone Safe Check', 'Troubleshoot common wired-earphone issues using external checks only.', 'easy', 'Wired earphones, another known-good device, dry cloth', 'Unplug the earphones and inspect the cable for exposed copper|Check the plug and device port for visible debris without inserting tools|Try the earphones on another device at low volume|Test left, right and microphone functions|If the wire is frayed or audio cuts when moved, stop using and replace or use a qualified repairer', 'earphones,repair,safety','Do not splice wires, solder near the ears, or use earphones with exposed conductors.'],
@@ -186,6 +187,51 @@ const ideaTheme = (slug: string, tags: string) => {
 const photoUrl = (source: string, width: number) => source.startsWith('http')
   ? source
   : photo(source, width);
+
+// This guide follows a published plastic-bottle basket method: the bottle
+// supplies the attached stakes and base, while bag strips form the weavers.
+const basketStepGuides: IdeaStep[] = [
+  {
+    id: 'plastic-bag-weaving-1', position: 0, title: 'Choose and clean two bottles',
+    description: 'Pick one sturdy, straight-sided drink bottle for the basket frame and a second bottle to make the inner liner. Wash both with dish soap, rinse them, remove labels and let them dry completely. Choose two clean bags in different colours so you can see the over-under pattern as you work.',
+    image: { url: 'https://bouw.ru/userfiles/1571_2.jpg', source: 'https://bouw.ru/article/korzinki-iz-plastikovih-butilok-svoimi-rukami', alt: 'Finished handwoven baskets made from reused plastic bottles' },
+  },
+  {
+    id: 'plastic-bag-weaving-2', position: 1, title: 'Cut an attached bottle frame',
+    description: 'With an adult handling the scissors, remove the first bottle’s neck and shoulder so the straight lower body remains attached to its solid base. Mark roughly finger-width vertical bands around that body. Cut down each mark, stopping above the base so every band stays attached as an upright stake. Keep the stakes similar in width; an even count gives vertical colour columns, while an odd count creates a spiral pattern.',
+    image: { url: 'https://i.pinimg.com/originals/89/c3/2c/89c32c3f350480da033d6dbf76661e0a.jpg', source: 'https://storage.googleapis.com/dizoyfqahpyyle/how-to-make-a-basket-using-plastic-bottles.html', alt: 'Photo sequence showing bottle preparation and plastic strip weaving' },
+  },
+  {
+    id: 'plastic-bag-weaving-3', position: 2, title: 'Make long, even bag strips',
+    description: 'Flatten one dry bag and smooth out its folds. Cut away the handles and bottom seam, then start at one open edge and spiral upward to make one long strip about 2 cm wide. Repeat with the second colour. Keep the width fairly even; very narrow strips tear, while very wide ones are hard to weave.',
+    image: { url: 'https://prod-cms.scouts.org.uk/media/14508/now-we-re-going-to-turn-these-rectangles-into-long-strips.png', source: 'https://www.scouts.org.uk/activities/weave-goodbye-to-waste/', alt: 'Diagram showing how to cut a plastic bag into one continuous spiral strip' },
+  },
+  {
+    id: 'plastic-bag-weaving-4', position: 3, title: 'Anchor the two coloured weavers',
+    description: 'Take the end of the first strip and tuck it behind one upright stake, leaving a short tail on the left and the long working length on the right. Tuck the second colour behind the neighbouring stake. Keep both tails on the outside and hold them in place with your fingers; the first woven turns will lock them.',
+    image: { url: 'https://content.instructables.com/FQT/GG0D/IDZSJLPO/FQTGG0DIDZSJLPO.jpg?auto=webp&fit=bounds&frame=1&height=1024&width=1024', source: 'https://www.instructables.com/Plastic-Yarn-out-of-Plastic-Bags/', alt: 'Long plastic bag strips prepared for weaving' },
+  },
+  {
+    id: 'plastic-bag-weaving-5', position: 4, title: 'Weave one complete first row',
+    description: 'Work from left to right around the bottle. Take the left-hand strip across the outside of one stake, pass it behind the next stake and bring it back outside; then repeat with the other colour. Keep alternating the active strip and follow the same over-one, behind-one rhythm until you return to the start.',
+    image: { url: 'https://bouw.ru/userfiles/1424_6.jpg', source: 'https://bouw.ru/article/korzinki-iz-plastikovih-butilok-svoimi-rukami', alt: 'Illustrated over-under weaving pattern for plastic strips around basket stakes' },
+  },
+  {
+    id: 'plastic-bag-weaving-6', position: 5, title: 'Build the sides without stretching',
+    description: 'Press the first row down toward the bottle base, then repeat the same alternating weave for each new row. Snug the strips against each other, but do not pull hard: stretched plastic narrows and can split. If a strip runs out, tuck the next strip into the same gap where the old one exits, then keep weaving.',
+    image: { url: 'https://i.pinimg.com/originals/89/c3/2c/89c32c3f350480da033d6dbf76661e0a.jpg', source: 'https://storage.googleapis.com/dizoyfqahpyyle/how-to-make-a-basket-using-plastic-bottles.html', alt: 'Basket sides being formed by weaving strips around bottle stakes' },
+  },
+  {
+    id: 'plastic-bag-weaving-7', position: 6, title: 'Finish the rim and fit the liner',
+    description: 'Stop weaving with about a thumb-width of each stake still visible. Fold each stake inward over the top row and tuck its end into the weave; trim only the excess, and ask an adult to blunt any sharp corner. Cut the second bottle just below the rim height and ease it inside as a smooth liner—do not force it.',
+    image: { url: 'https://2.bp.blogspot.com/-dGWlEpC6efs/Ud97WcPFwLI/AAAAAAAAAac/1WlNgIY3jfw/s1600/keranjang%2Bbotol%2Bbekas%2Bcara.jpg', source: 'https://lovaliacrafty.blogspot.com/2015/11/daur-ulang-keranjang-dari-botol-bekas.html', alt: 'Completed basket made from a cut bottle with woven sides' },
+  },
+  {
+    id: 'plastic-bag-weaving-8', position: 7, title: 'Trim, check, and choose a safe use',
+    description: 'Tuck or trim loose strip ends so nothing catches fingers or clothing. Set the basket on a flat table and press each side gently to check that the base stays level and the stakes remain woven in. Use it for light, dry items such as pens or yarn; do not use it for food, hot items, liquids, children’s toys or heavy loads.',
+    image: { url: 'https://bouw.ru/userfiles/1632_1.jpg', source: 'https://englishpromo.ru/2019/12/korzinka-iz-plastikovoj-butilki-svoimi-rukami/', alt: 'Finished woven bottle baskets suitable for light storage' },
+  },
+];
 
 function expandStep(text: string, ideaTitle: string, theme: string) {
   const action = text.replace(/[.!?]+$/, '');
@@ -251,8 +297,14 @@ export const ideas: Idea[] = ideaRows.map(([slug, title, description, difficulty
   safetyNotes: caution ?? 'Disconnect power before handling. Stop if you find a damaged battery, exposed conductor, sharp part, heat, unusual smell or liquid damage; get qualified help.',
   materials: materials.split(', '),
   tags: tags.split(','),
-  coverImage: { url: photoUrl(images[0], 1200) },
-  steps: steps.split('|').map((text, index) => {
+  coverImage: slug === 'plastic-bag-weaving'
+    ? { url: 'https://bouw.ru/userfiles/1571_2.jpg', source: 'https://bouw.ru/article/korzinki-iz-plastikovih-butilok-svoimi-rukami', alt: 'Completed baskets woven from recycled plastic bottles' }
+    : { url: photoUrl(images[0], 1200) },
+  ...(slug === 'plastic-bag-weaving' ? { references: [
+    { label: 'Plastic Bottle Baskets — weaving instructions by Caroline Gregson', url: 'https://bluecoatdisplaycentre.com/outreach/wp-content/uploads/sites/3/2021/04/Recycled-Plastic-Basket-Weaving-Instructions-Caroline-Gregson.pdf' },
+    { label: 'Scouts UK — cutting a plastic bag into a continuous strip', url: 'https://www.scouts.org.uk/activities/weave-goodbye-to-waste/' },
+  ] } : {}),
+  steps: slug === 'plastic-bag-weaving' ? basketStepGuides : steps.split('|').map((text, index) => {
     return {
       id: `${slug}-${index + 1}`,
       position: index,
