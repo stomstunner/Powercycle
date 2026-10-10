@@ -82,7 +82,7 @@ nav a:hover, nav a.active { background: var(--mint); color: var(--primary); }
 .auth-help a { color: #d16bff; font-weight: 750; }
 .user-chip { color: var(--muted); font-size: .7rem; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .signout-button { align-items: center; background: transparent; border: 1px solid var(--border); border-radius: .55rem; color: var(--muted); cursor: pointer; display: inline-flex; padding: .5rem; }
-.collection-page { background: radial-gradient(circle at 0 0, rgb(116 24 210 / 17%), transparent 28rem), var(--surface-2); max-width: none; }
+.collection-page { background: radial-gradient(circle at 0 0, rgb(116 24 210 / 17%), transparent 28rem), var(--surface-2); max-width: none; overflow-x: clip; }
 .collection-hero, .collection-layout { margin-left: auto; margin-right: auto; max-width: 1180px; }
 .collection-hero { align-items: end; display: flex; gap: 2rem; justify-content: space-between; padding-bottom: 1.6rem; }
 .collection-hero h1 { color: var(--ink); font-size: clamp(2.2rem, 5vw, 4rem); margin-bottom: .5rem; }
@@ -93,6 +93,13 @@ nav a:hover, nav a.active { background: var(--mint); color: var(--primary); }
 .collection-steps b { align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 50%; display: flex; height: 1.65rem; justify-content: center; width: 1.65rem; }
 .collection-steps .is-current { color: var(--primary); font-weight: 800; }.collection-steps .is-current b { background: var(--primary); border-color: var(--primary); color: #fff; }.collection-steps i { background: var(--border); flex: 1; height: 2px; }
 .collection-layout { align-items: start; display: grid; gap: 1rem; grid-template-columns: minmax(0, 1.6fr) minmax(280px, .9fr); }
+.collection-layout > *, .collection-card, .collection-aside, .collection-form, .collection-form > *, .collection-form .form-row, .collection-form label { min-width: 0; max-width: 100%; }
+.collection-form input, .collection-form select, .collection-form textarea { box-sizing: border-box; max-width: 100%; min-width: 0; width: 100%; }
+.collection-form .form-row.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.collection-form .form-row.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.collection-form .device-row { grid-template-columns: minmax(0, 1.35fr) minmax(0, .65fr); }
+.collection-form label { overflow-wrap: anywhere; }
+.activity-assessment-image { border: 1px solid var(--border); border-radius: .7rem; display: block; margin: .8rem 0; max-height: 260px; max-width: min(100%, 360px); object-fit: cover; }
 .collection-card, .collection-info, .collection-safety { background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; padding: 1.25rem; }
 .collection-card-title { align-items: center; display: flex; gap: .8rem; margin-bottom: 1.2rem; }.collection-card-title h2 { color: var(--ink); font-size: 1.1rem; margin: 0; text-transform: capitalize; }.collection-card-title p { font-size: .72rem; margin: .2rem 0 0; }.collection-icon { align-items: center; background: var(--mint); border-radius: .7rem; color: var(--primary); display: flex; height: 2.5rem; justify-content: center; width: 2.5rem; }
 .collection-form { display: grid; gap: .85rem; }.form-row { display: grid; gap: .7rem; }.form-row.three { grid-template-columns: repeat(3, 1fr); }.form-row.two { grid-template-columns: repeat(2, 1fr); }.device-row { grid-template-columns: 1.35fr .65fr; }.collection-form textarea { min-height: 80px; resize: vertical; }
