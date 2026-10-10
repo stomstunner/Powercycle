@@ -10,7 +10,7 @@ import { ideas, products } from './data/catalog.js';
 import { recommendAssessment } from './services/recommendation.js';
 import { requireAuth } from './middleware/authenticate.js';
 import { imageUpload } from './middleware/upload.js';
-import { analyseDeviceImage, generateRepairPlan } from './services/aiAnalysis.js';
+import { analyseDeviceImage, cloudflareAiErrorMessage, cloudflareAiStatus, generateRepairPlan } from './services/aiAnalysis.js';
 import { collectionRequestSchema } from './schemas/collection.js';
 import { AssessmentModel } from './models/assessment.js';
 import { CollectionRequestModel } from './models/collectionRequest.js';
@@ -435,7 +435,7 @@ app.get('/api/v1/health', (_request, response) => {
 
   app.get('/api/v1/ai/status', (_request, response) => {
     response.json({
-      data: { configured: Boolean(env.GEMINI_API_KEY), model: env.GEMINI_MODEL.replace(/^models\//, '') },
+      data: cloudflareAiStatus(),
       error: null,
       meta: {},
     });
@@ -483,7 +483,7 @@ app.get('/api/v1/health', (_request, response) => {
       response.json({ data: { ...plan, assessmentId: assessment.id }, error: null, meta: { persisted: true } });
     } catch (error) {
       const code = error instanceof Error ? error.message : 'AI_UNAVAILABLE';
-      response.status(503).json({ data: null, error: { code, message: code === 'AI_NOT_CONFIGURED' ? 'Gemini repair guidance is not configured on the server.' : 'Gemini could not make a safe repair plan right now. Try again later.' }, meta: {} });
+      response.status(503).json({ data: null, error: { code, message: code === 'AI_INVALID_RESPONSE' ? 'Cloudflare could not make a safe repair plan right now. Try again later.' : cloudflareAiErrorMessage(code) }, meta: {} });
     }
   });
 
