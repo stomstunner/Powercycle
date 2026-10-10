@@ -24,10 +24,14 @@ type DeviceDetails = {
   problem?: string;
 };
 
-const MODEL = env.CLOUDFLARE_AI_MODEL;
 // Llama 3.2 Vision can return 5016 until its license is accepted per account.
 // Use a vision-capable Cloudflare model that does not require that acceptance.
 const AGREEMENT_FALLBACK_MODEL = '@cf/qwen/qwen3.8-27b';
+// Render already has the old Llama model set explicitly, overriding the new
+// default. Migrate that legacy value in code so no dashboard edit is needed.
+const MODEL = env.CLOUDFLARE_AI_MODEL === '@cf/meta/llama-3.2-11b-vision-instruct'
+  ? AGREEMENT_FALLBACK_MODEL
+  : env.CLOUDFLARE_AI_MODEL;
 const aiSchema = z.object({
   deviceCategory: z.string().max(100),
   visibleObservations: z.array(z.string().max(300)).max(8),
