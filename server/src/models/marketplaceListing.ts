@@ -22,6 +22,8 @@ const marketplaceListingSchema = new Schema({
   shippingAvailable: { type: Boolean, default: false },
   publicCity: { type: String, maxlength: 80 },
   publicState: { type: String, maxlength: 80 },
+  contactPhone: { type: String, maxlength: 20, default: '' },
+  showContactPhone: { type: Boolean, default: false },
 }, { timestamps: true });
 
 marketplaceListingSchema.index({ status: 1, category: 1, createdAt: -1 });

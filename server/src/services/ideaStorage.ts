@@ -33,6 +33,10 @@ export async function uploadMarketplaceImage(ownerId: string, file: Express.Mult
   return uploadImage('marketplace', ownerId, file);
 }
 
+export async function uploadAssessmentImage(ownerId: string, file: Express.Multer.File) {
+  return uploadImage('assessments', ownerId, file);
+}
+
 export async function removeIdeaImage(storageKey: string) {
   if (!storageConfigured()) return;
   await fetch(`${env.SUPABASE_URL}/storage/v1/object/${env.SUPABASE_STORAGE_BUCKET}`, {

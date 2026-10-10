@@ -11,6 +11,11 @@ const assessmentSchema = new Schema({
   reason: { type: String, required: true },
   nextSteps: [{ type: String }],
   safetyFlags: [{ type: String }],
+  brand: { type: String, maxlength: 100 },
+  modelName: { type: String, maxlength: 100 },
+  image: { storageKey: String, contentType: String, sizeBytes: Number },
+  aiAnalysis: { type: Schema.Types.Mixed },
+  repairPlan: { type: Schema.Types.Mixed },
 }, { timestamps: true });
 
 assessmentSchema.index({ userId: 1, createdAt: -1 });

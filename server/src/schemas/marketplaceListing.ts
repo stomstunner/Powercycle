@@ -12,4 +12,6 @@ export const marketplaceListingSchema = z.object({
   publicCity: z.string().trim().max(80).optional().default(''),
   publicState: z.string().trim().max(80).optional().default(''),
   sourceIdeaId: z.string().trim().max(80).optional(),
+  contactPhone: z.string().trim().max(20).optional().default(''),
+  showContactPhone: z.coerce.boolean().default(false),
 });

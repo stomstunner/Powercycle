@@ -14,6 +14,8 @@ export type AiAnalysis = {
   safetyFlags?: string[];
 };
 
+export type RepairPlan = { steps: Array<{ title: string; description: string }>; safetyNote: string };
+
 type DeviceDetails = {
   deviceType?: string;
   brand?: string;
@@ -29,6 +31,27 @@ const aiSchema = z.object({
   uncertainties: z.array(z.string().max(300)).max(8),
   safetyFlags: z.array(z.string().max(300)).max(8),
 });
+
+const repairPlanSchema = z.object({
+  steps: z.array(z.object({ title: z.string().trim().min(3).max(100), description: z.string().trim().min(10).max(500) })).length(10),
+  safetyNote: z.string().trim().min(10).max(500),
+});
+
+export async function generateRepairPlan(details: { deviceType: string; brand?: string; modelName?: string; condition: string; problems: string[]; notes?: string; aiAnalysis?: AiAnalysis }): Promise<RepairPlan> {
+  if (!env.GEMINI_API_KEY) throw new Error('AI_NOT_CONFIGURED');
+  const model = env.GEMINI_MODEL.replace(/^models\//, '');
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(env.GEMINI_API_KEY)}`;
+  const prompt = `Create a conservative, safe repair or reuse plan for this assessed device. Details: ${JSON.stringify(details)}. Return JSON with exactly 10 ordered steps, each with title and description, and safetyNote. Only steps a non-expert can do without opening the device: external checks, settings, backups, cleaning exterior while unplugged, checking a known-good cable/charger, warranty/service research, data protection, repair-shop preparation, and responsible reuse/recycling. Never instruct opening electronics, puncturing/heating batteries, working on swollen/damaged batteries, mains voltage, chargers/power supplies, capacitors, soldering, or bypassing safety features. If there are hazardous symptoms, steps must stop use and arrange qualified service/recycling. Never promise a repair will work.`;
+  const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: 'application/json' } }), signal: AbortSignal.timeout(20000) });
+  if (!response.ok) throw new Error(response.status === 429 ? 'AI_RATE_LIMITED' : 'AI_UNAVAILABLE');
+  const payload = await response.json() as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
+  const text = payload.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) throw new Error('AI_INVALID_RESPONSE');
+  const plan = repairPlanSchema.parse(JSON.parse(text));
+  const riskyInstruction = /\b(open|disassemble|unscrew|solder|puncture|heat|remove battery|bypass|short circuit|mains voltage|capacitor)\b/i;
+  if (plan.steps.some((step) => riskyInstruction.test(`${step.title} ${step.description}`))) throw new Error('AI_INVALID_RESPONSE');
+  return plan;
+}
 
 export async function analyseDeviceImage(file: { buffer: Buffer; mimetype: string }, details: DeviceDetails = {}): Promise<AiAnalysis> {
   const requestId = randomUUID();
