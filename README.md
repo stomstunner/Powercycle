@@ -2,6 +2,8 @@
 
 PowerCycle is a circular-economy prototype for giving unwanted electronics a new purpose.
 
+https://powercycle.vercel.app/
+
 ## Current status
 
 PowerCycle helps people assess older electronics and choose repair, reuse, upcycling, or responsible recycling. The application has a Vite client, Express API, Supabase authentication, MongoDB persistence, deterministic assessment guidance, optional Cloudflare Workers AI photo observations and repair plans, community idea publishing, seller listings, manual marketplace request-to-buy, collection requests, feedback, and account-scoped activity. The catalog cart is a clearly labelled demo; PowerCycle does not process catalog payments or arrange shipments.
