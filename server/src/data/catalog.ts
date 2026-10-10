@@ -92,12 +92,48 @@ export type Idea = {
   steps: IdeaStep[];
 };
 
-const ideaPhotos = [
-  'photo-1513364776144-60967b0f800f', 'photo-1513519245088-0e12902e5a38', 'photo-1518005020951-eccb494ad742',
-  'photo-1581092921461-eab62e97a780', 'photo-1530124566582-a618bc2615dc', 'photo-1528459105426-b9548367069b',
-  'photo-1516321318423-f06f85e504b3', 'photo-1581092160607-ee22621dd758', 'photo-1558618666-fcd25c85cd64',
-  'photo-1532996122724-e3c354a0b15b',
-];
+// Topic-matched, real web photography. Unsplash images use its free image CDN;
+// a few craft/recycling examples link directly to the source article's image.
+const ideaPhotoGroups: Record<string, string[]> = {
+  craft: [
+    'photo-1513364776144-60967b0f800f', 'https://framerusercontent.com/images/NoSIyYEK7DQWSNx6ZuTxX65rSEo.jpg?height=1200&width=1600',
+    'photo-1455390582262-044cdead277a', 'photo-1528459105426-b9548367069b',
+  ],
+  plastic: [
+    'https://hips.hearstapps.com/hmg-prod/images/6ae08c41-94be-4f40-9487-2bb0823c59fd.jpg?crop=0.888671875xw%3A1xh%3Bcenter%2Ctop&resize=1200%3A%2A',
+    'https://phelieunhuahcm.com/upload/baiviet/trongrautrongchainhua-3029.jpg',
+    'https://hips.hearstapps.com/hmg-prod/images/6ae08c41-94be-4f40-9487-2bb0823c59fd.jpg?crop=0.888671875xw%3A1xh%3Bcenter%2Ctop&resize=1200%3A%2A',
+    'https://phelieunhuahcm.com/upload/baiviet/trongrautrongchainhua-3029.jpg',
+  ],
+  bottleHolder: [
+    'https://hips.hearstapps.com/hmg-prod/images/a83e3741-95f1-4933-a6af-870ec73240a4.jpg',
+    'https://media.indozone.id/crop/1200x630%3A0x0/smart/photo/indizone/2022/07/22/5js5J5j/7-kerajinan-tangan-dari-botol-plastik-bekas-yang-mudah-dibuat89.jpg',
+    'https://hips.hearstapps.com/hmg-prod/images/a83e3741-95f1-4933-a6af-870ec73240a4.jpg',
+    'https://media.indozone.id/crop/1200x630%3A0x0/smart/photo/indizone/2022/07/22/5js5J5j/7-kerajinan-tangan-dari-botol-plastik-bekas-yang-mudah-dibuat89.jpg',
+  ],
+  phoneStand: [
+    'https://1.bp.blogspot.com/-AvTgWi_A9ok/XvHYdhjrH6I/AAAAAAAATVo/d3xinBXu9DM3f1a8JwoFGL4YnCN22nckgCK4BGAsYHg/s1200/IMG_20200411_180302.jpg',
+    'https://1.bp.blogspot.com/-AvTgWi_A9ok/XvHYdhjrH6I/AAAAAAAATVo/d3xinBXu9DM3f1a8JwoFGL4YnCN22nckgCK4BGAsYHg/s1200/IMG_20200411_180302.jpg',
+    'https://1.bp.blogspot.com/-AvTgWi_A9ok/XvHYdhjrH6I/AAAAAAAATVo/d3xinBXu9DM3f1a8JwoFGL4YnCN22nckgCK4BGAsYHg/s1200/IMG_20200411_180302.jpg',
+    'https://1.bp.blogspot.com/-AvTgWi_A9ok/XvHYdhjrH6I/AAAAAAAATVo/d3xinBXu9DM3f1a8JwoFGL4YnCN22nckgCK4BGAsYHg/s1200/IMG_20200411_180302.jpg',
+  ],
+  laptop: [
+    'photo-1517336714731-489689fd1ca8', 'photo-1496181133206-80ce9b88a853',
+    'photo-1593640408182-31c70c8268f5', 'photo-1516321318423-f06f85e504b3',
+  ],
+  phone: ['photo-1598327105666-5b89351aff97', 'photo-1511707171634-5f897ff02aa9', 'photo-1523206489230-c012c64b2b48', 'photo-1512499617640-c74ae3a79d37'],
+  audio: ['photo-1505740420928-5e560c06d30e', 'photo-1583394838336-acd977736f90', 'photo-1505740420928-5e560c06d30e', 'photo-1583394838336-acd977736f90'],
+  keyboard: [
+    'https://i.pinimg.com/originals/c0/48/e5/c048e56476b7ae70b741279c2e7f9bd2.jpg',
+    'https://imagenes.computerhoy.20minutos.es/files/image_1920_1080/uploads/imagenes/2022/11/28/68e691f96b521.jpeg',
+    'photo-1587829741301-dc798b83add3', 'photo-1527443224154-c4a3942d3acf',
+  ],
+  recycling: [
+    'https://www.3econcepts.in/images/india_ewaste.jpg', 'photo-1532996122724-e3c354a0b15b',
+    'https://bwmgroup.in/assets/images/Endeavours/Recycling/Desktop%20disposal.jpeg', 'photo-1581092921461-eab62e97a780',
+  ],
+  electronics: ['photo-1581092921461-eab62e97a780', 'photo-1581092160607-ee22621dd758', 'photo-1530124566582-a618bc2615dc', 'photo-1532996122724-e3c354a0b15b'],
+};
 type IdeaRow = [slug: string, title: string, description: string, difficulty: Idea['difficulty'], materials: string, steps: string, tags: string, caution?: string];
 const ideaRows: IdeaRow[] = [
   ['keyboard-key-art', 'Keyboard-Key Art', 'Arrange retired keycaps into a name, short quote or geometric wall panel.', 'easy', 'Clean loose keycaps, cardboard backing, picture frame, ruler, craft glue', 'Choose a short design|Arrange the keys dry first|Glue keys onto firm backing|Fit backing into frame|Add hanging hardware and label the material story', 'keyboard,decor,beginner'],
@@ -132,20 +168,98 @@ const ideaRows: IdeaRow[] = [
   ['e-waste-sort-at-home', 'Sort Small E-Waste Before Drop-Off', 'Prepare household electronics for a verified collection or authorized recycler.', 'easy', 'Small box, labels, tape, device list, local authorized recycler details', 'Separate electronics from household trash|Keep loose batteries apart and cover exposed battery terminals if the recycler instructs|Do not dismantle any device|Remove personal data from working phones and computers|Check accepted items and hours with an authorized local recycler before travel', 'recycling,collection,safety','Follow local recycler instructions; do not put batteries in regular bins.'],
 ];
 
-export const ideas: Idea[] = ideaRows.map(([slug, title, description, difficulty, materials, steps, tags, caution], ideaIndex) => ({
+const ideaTheme = (slug: string, tags: string) => {
+  const searchable = `${slug} ${tags}`.toLowerCase();
+  if (/e-waste|recycl|collection/.test(searchable)) return 'recycling';
+  if (/earphone|headphone|audio/.test(searchable)) return 'audio';
+  if (/keyboard/.test(searchable)) return 'keyboard';
+  if (/laptop/.test(searchable)) return 'laptop';
+  if (/plastic-bag-weaving/.test(searchable)) return 'craft';
+  if (/plastic-bottle-pen-stand/.test(searchable)) return 'bottleHolder';
+  if (/cardboard-phone-stand/.test(searchable)) return 'phoneStand';
+  if (/phone|tablet/.test(searchable)) return 'phone';
+  if (/plastic/.test(searchable)) return 'plastic';
+  if (/paper|craft|cardboard|gift|decor|frame|cd|weav/.test(searchable)) return 'craft';
+  return 'electronics';
+};
+
+const photoUrl = (source: string, width: number) => source.startsWith('http')
+  ? source
+  : photo(source, width);
+
+function expandStep(text: string, ideaTitle: string, theme: string) {
+  const action = text.replace(/[.!?]+$/, '');
+  const lower = text.toLowerCase();
+  if (/separate|sort|group|collect/.test(lower)) {
+    return `${action}. Keep each type of item in a clearly marked group so reusable devices, cables and batteries do not get mixed into household waste. Do not dismantle equipment or handle a swollen or leaking battery. Confirm the receiving recycler accepts each item before you travel.`;
+  }
+  if (/plan|sketch|draw|arrange|lay out|choose a short|select|measure|space|position/.test(lower)) {
+    return `${action}. Set the pieces out on a clear surface before attaching anything, then check the size, spacing and order from the place where the finished project will be used. This dry run makes it easy to spot missing materials or an awkward fit while everything can still be moved.`;
+  }
+  if (/do not|never|avoid|reject|exclude|stop using/.test(lower)) {
+    return `${action}. Treat this as a safety stop, not a step to work around: leave the item disconnected and keep it away from children, heat and flammable materials. Do not try another repair method or hide the damage. Ask a qualified repairer or authorized recycler to advise on the next safe option.`;
+  }
+  if (/shut down|power off|unplug|disconnect/.test(lower)) {
+    return `${action}. Confirm the device is fully off and separated from its charger or other power source before touching it. Keep liquids and loose metal objects away from the work area, and wait for the device to cool if it has been in use. Continue only when the outside looks undamaged and dry.`;
+  }
+  if (/firmware|password|trusted .* app|settings|official system/.test(lower)) {
+    return `${action}. Follow the maker's instructions for the exact model and use its official settings or support page rather than an unknown download. Keep account details private, save any settings the owner needs first, and do not interrupt an update once it starts.`;
+  }
+  if (/charg|charger|charging/.test(lower)) {
+    return `${action}. Use a compatible, undamaged charger on a hard, ventilated surface and keep the cable clear of walkways. Stay nearby for the first few minutes and check that the device remains cool. Disconnect it and seek help if you notice heat, swelling, a smell or visible damage.`;
+  }
+  if (/cut|trim|punch|mark|trace|fold/.test(lower)) {
+    return `${action}. Work on a flat, well-lit surface and measure the fit before making a permanent cut or fold. Keep fingers clear of the cutting path, use blunt scissors for simple craft materials, and ask an adult to handle any sharp tool. Check the piece against the design before moving on.`;
+  }
+  if (/wash|clean|wipe|brush|dry/.test(lower)) {
+    const cleaning = theme === 'plastic' || theme === 'bottleHolder'
+      ? 'Wash reusable plastic with mild soap and clean water, then rinse away any soap.'
+      : theme === 'phone' || theme === 'laptop' || theme === 'audio' || theme === 'keyboard' || theme === 'electronics'
+        ? 'Use a soft, dry cloth on electronic surfaces; never pour liquid into ports, keys or openings.'
+        : 'Remove dirt gently with the dry or mild cleaning method suitable for the material.';
+    return `${action}. ${cleaning} Let the item dry fully before assembly so labels, paper and adhesives stay secure. Check that no residue, sharp edge or loose part remains before continuing.`;
+  }
+  if (/inspect|check|look|confirm|test|try|verify|monitor|restart/.test(lower)) {
+    return `${action}. Change one thing at a time so you can tell whether the result comes from the device, its cable, its settings or its surroundings. Note what you observe and compare it with the expected result. If you notice heat, a damaged battery, exposed wire, liquid or a burning smell, stop and get qualified help.`;
+  }
+  if (/back up|save|remove personal|sign out|factory-reset/.test(lower)) {
+    return `${action}. Protect the owner's files and accounts before changing settings or handing the device to someone else. Use a trusted backup destination and open a few copied files to make sure they are readable. Keep passwords private, and do not erase anything until the owner has confirmed the backup.`;
+  }
+  if (/glue|attach|secure|reinforce|fit|thread|wrap|connect|install|set a new|label|arrange|place|add|use|choose|select|separate|sort|store|hang|fill|apply|restart|update/.test(lower)) {
+    const context = (theme === 'plastic' || theme === 'bottleHolder') && /soil|plant|water/.test(lower)
+      ? 'Keep the planter light, use potting mix rather than garden soil, and set it on a waterproof tray until you know that excess water drains safely.'
+      : theme === 'plastic' || theme === 'bottleHolder'
+      ? 'Use only clean, dry packaging that never held chemicals, and finish every cut edge before it can be touched.'
+      : theme === 'electronics' || theme === 'laptop' || theme === 'phone' || theme === 'audio' || theme === 'keyboard'
+        ? 'Keep the device disconnected from power while you work, and handle only its external surfaces or the inert parts named in the guide.'
+        : 'Lay the parts out first and make small adjustments before fixing anything in place; this keeps the finished project neat and easier to reuse.';
+    return `${action}. ${context} Work slowly and use only the materials listed for this guide. Pause to check alignment, stability and the finish before moving to the next step; if the result feels loose or unsafe, correct it now rather than covering the problem.`;
+  }
+  return `${action}. Take this one part of “${ideaTitle}” at a time, with the materials close by and the work area clear. Compare the result with the previous step before moving on, and make small corrections while the parts are still easy to adjust. Stop if you find damage or an unsafe condition.`;
+}
+
+function stepTitle(text: string) {
+  const sentence = text.replace(/[.!?]+$/, '');
+  return sentence.length > 56 ? `${sentence.slice(0, 53).trimEnd()}…` : sentence;
+}
+
+export const ideas: Idea[] = ideaRows.map(([slug, title, description, difficulty, materials, steps, tags, caution]) => {
+  const theme = ideaTheme(slug, tags);
+  const images = ideaPhotoGroups[theme];
+  return {
   slug, title, description, difficulty,
   safetyNotes: caution ?? 'Disconnect power before handling. Stop if you find a damaged battery, exposed conductor, sharp part, heat, unusual smell or liquid damage; get qualified help.',
   materials: materials.split(', '),
   tags: tags.split(','),
-  coverImage: { url: photo(ideaPhotos[ideaIndex % ideaPhotos.length], 1200) },
+  coverImage: { url: photoUrl(images[0], 1200) },
   steps: steps.split('|').map((text, index) => {
-    const [stepTitle, ...descriptionParts] = text.split(': ');
     return {
       id: `${slug}-${index + 1}`,
       position: index,
-      title: descriptionParts.length ? stepTitle : `Step ${index + 1}`,
-      description: descriptionParts.length ? descriptionParts.join(': ') : text,
-      image: { url: photo(ideaPhotos[(ideaIndex + index + 1) % ideaPhotos.length], 700) },
+      title: stepTitle(text),
+      description: expandStep(text, title, theme),
+      image: { url: photoUrl(images[(index + 1) % images.length], 700) },
     };
   }),
-}));
+  };
+});
