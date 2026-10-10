@@ -7,51 +7,145 @@ export type Product = {
   sourceMaterial: string;
   conditionNote: string;
   isDemo: true;
+  imageUrl: string;
+  sellerName: string;
+  sellerLocation: string;
+  specifications: Array<{ label: string; value: string }>;
+  includedItems: string[];
 };
 
-export const products: Product[] = [
-  ['refurbished-bluetooth-speaker', 'Refurbished Bluetooth Speaker', 1499, 'Audio', 'Recovered speaker components'],
-  ['upcycled-keyboard-wall-art', 'Upcycled Keyboard Wall Art', 499, 'Decor', 'Retired keyboard keys'],
-  ['electronic-parts-desk-organizer', 'Electronic Parts Desk Organizer', 399, 'Desk', 'Recovered electronic parts'],
-  ['cable-organizer', 'Cable Organizer', 199, 'Desk', 'Reclaimed cable materials'],
-  ['upcycled-cd-decoration', 'Upcycled CD Decoration', 249, 'Decor', 'Retired optical discs'],
-  ['diy-stem-electronics-learning-kit', 'DIY STEM/Electronics Learning Kit', 699, 'Learning', 'Recovered low-voltage components'],
-  ['refurbished-computer-mouse', 'Refurbished Computer Mouse', 299, 'Accessories', 'Tested recovered mouse'],
-  ['refurbished-led-desk-lamp', 'Refurbished LED Desk Lamp', 599, 'Lighting', 'Recovered lamp components'],
-  ['tech-themed-photo-frame', 'Tech-Themed Photo Frame', 349, 'Decor', 'Recovered circuit-board details'],
-  ['mini-storage-box', 'Mini Storage Box', 299, 'Storage', 'Reclaimed device casing'],
-].map(([slug, name, priceInr, category, sourceMaterial]) => ({
-  slug: slug as string,
-  name: name as string,
-  description: 'A demonstration marketplace listing for the PowerCycle prototype.',
-  priceInr: priceInr as number,
-  category: category as string,
-  sourceMaterial: sourceMaterial as string,
-  conditionNote: 'Prototype listing; availability, fulfilment, and warranty are not provided.',
-  isDemo: true,
-}));
+const photo = (id: string, width = 900) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=80`;
+const productPhotoIds = [
+  'photo-1517336714731-489689fd1ca8', 'photo-1598327105666-5b89351aff97', 'photo-1511707171634-5f897ff02aa9',
+  'photo-1496181133206-80ce9b88a853', 'photo-1527814050087-3793815479db', 'photo-1608043152269-423dbba4e7e1',
+  'photo-1583394838336-acd977736f90', 'photo-1588872657578-7efd1f1555ed', 'photo-1512499617640-c74ae3a79d37',
+  'photo-1544244015-0df4b3ffc6b0', 'photo-1516035069371-29a1b244cc32', 'photo-1527443224154-c4a3942d3acf',
+  'photo-1587829741301-dc798b83add3', 'photo-1523206489230-c012c64b2b48', 'photo-1505740420928-5e560c06d30e',
+  'photo-1593640408182-31c70c8268f5', 'photo-1588872657578-7efd1f1555ed', 'photo-1592899677977-9c10ca588bbd',
+  'photo-1585386959984-a4155224a1ad', 'photo-1583394838336-acd977736f90', 'photo-1598327105666-5b89351aff97',
+  'photo-1496181133206-80ce9b88a853', 'photo-1527814050087-3793815479db', 'photo-1608043152269-423dbba4e7e1',
+  'photo-1517336714731-489689fd1ca8', 'photo-1544244015-0df4b3ffc6b0', 'photo-1516035069371-29a1b244cc32',
+  'photo-1527443224154-c4a3942d3acf', 'photo-1511707171634-5f897ff02aa9', 'photo-1588872657578-7efd1f1555ed',
+];
 
+type ProductRow = [slug: string, name: string, price: number, category: string, material: string, condition: string, description: string, specs: string, included: string];
+const productRows: ProductRow[] = [
+  ['refurbished-bluetooth-speaker', 'Refurbished Bluetooth Speaker', 1499, 'Audio', 'Recovered speaker components', 'Refurbished demo · functionality not verified', 'Portable speaker concept with a fabric grille and rechargeable battery. This sample listing explains the kind of details a real seller should verify before sale.', 'Portable audio; Bluetooth; battery condition unverified', 'Speaker only; charger not included'],
+  ['upcycled-keyboard-wall-art', 'Upcycled Keyboard Wall Art', 499, 'Decor', 'Retired keyboard keys', 'Handmade demo example', 'A framed graphic made from cleaned, non-powered keyboard keycaps. Key layout and finish vary by maker.', 'Approx. 20 × 25 cm; wall-hanging frame; handmade', 'Decorative frame; hanging hook'],
+  ['electronic-parts-desk-organizer', 'Electronic Parts Desk Organizer', 399, 'Desk', 'Recovered electronic parts', 'Handmade demo example', 'A small desk caddy using cleaned, blunt, non-powered parts set into a stable base. Not a storage container for food.', 'Approx. 15 × 10 × 8 cm; reclaimed exterior', 'One desk organizer'],
+  ['cable-organizer', 'Reusable Cable Wrap Set', 199, 'Accessories', 'Reclaimed fabric and cable offcuts', 'Handmade demo example', 'Soft reusable ties help keep charging and audio cables untangled. The ties are decorative organizers, not electrical repair parts.', 'Set of 5; assorted lengths; reusable ties', 'Five cable wraps'],
+  ['upcycled-cd-decoration', 'Upcycled CD Sun Catcher', 249, 'Decor', 'Retired optical discs', 'Handmade demo example', 'Reflective retired discs are mounted as lightweight indoor decor. Keep away from children and direct heat.', 'Approx. 25 cm hanging length; indoor use', 'One hanging decoration'],
+  ['diy-stem-electronics-learning-kit', 'Low-Voltage STEM Learning Kit', 699, 'Learning', 'Recovered low-voltage components', 'Demo kit · component testing required', 'A supervised learning pack concept for identifying safe, low-voltage components. Contents must be checked by an adult before use.', 'Low-voltage only; exact components vary; adult supervision', 'Assorted parts; no mains or battery cells'],
+  ['refurbished-computer-mouse', 'Refurbished USB Mouse', 299, 'Accessories', 'Tested recovered mouse', 'Refurbished demo · test before use', 'Wired USB mouse example listing. A real seller should confirm cursor, wheel, buttons and cable condition.', 'USB wired; optical; model unspecified', 'Mouse only'],
+  ['refurbished-led-desk-lamp', 'Refurbished LED Desk Lamp', 599, 'Lighting', 'Recovered lamp components', 'Refurbished demo · electrical inspection required', 'Desk lamp example with recovered housing. Mains electrical parts must be inspected by a qualified technician before use.', 'LED desk lamp; input and wattage not verified', 'Lamp only; bulb and warranty not confirmed'],
+  ['tech-themed-photo-frame', 'Circuit-Pattern Photo Frame', 349, 'Decor', 'Recovered circuit-board details', 'Handmade demo example', 'A photo frame with decorative, cleaned circuit-board accents sealed behind a smooth protective layer.', 'Fits 10 × 15 cm photo; tabletop display', 'One frame'],
+  ['mini-storage-box', 'Reused Electronics Parts Box', 299, 'Storage', 'Reclaimed device casing', 'Handmade demo example', 'A cleaned, empty outer casing repurposed for stationery or small dry items. No electronic parts or batteries remain.', 'Approx. 18 × 12 × 6 cm; dry indoor storage', 'One empty storage box'],
+  ['refurbished-laptop-core-i5', 'Refurbished 14-inch Laptop', 12999, 'Laptops', 'Reused laptop components', 'Refurbished demo · specs illustrative only', 'Example refurbished laptop listing. Before any real sale, confirm exact model, battery health, charger, storage, RAM and operating-system activation.', '14-inch display; Core i5 class; RAM/storage unverified', 'Laptop only; charger status to be confirmed'],
+  ['refurbished-laptop-student', 'Student Laptop 8 GB RAM', 15999, 'Laptops', 'Recovered and inspected laptop', 'Refurbished demo · specs illustrative only', 'A budget laptop listing example for browsing, documents and online classes. Battery runtime and ports need an in-person check.', '8 GB RAM stated as example; SSD size unverified; webcam check needed', 'Laptop; charger inclusion must be confirmed'],
+  ['refurbished-laptop-business', 'Business Laptop with SSD', 18999, 'Laptops', 'Refurbished business device', 'Refurbished demo · specs illustrative only', 'Business laptop example with a fast-storage configuration. Ask for the exact model number and proof of a clean OS reset.', 'SSD listed; processor generation and capacity unverified', 'Laptop; no software licence represented'],
+  ['refurbished-laptop-compact', 'Compact 13-inch Laptop', 16999, 'Laptops', 'Reused laptop components', 'Refurbished demo · specs illustrative only', 'Compact laptop example for travel and everyday work. Check hinge stability, keyboard, screen and battery before arranging a purchase.', '13-inch class; resolution and battery condition unverified', 'Laptop only'],
+  ['refurbished-android-phone', 'Refurbished Android Phone', 5999, 'Phones', 'Recovered smartphone', 'Refurbished demo · specs illustrative only', 'Android phone listing example. Confirm model, IMEI status, screen, cameras, charging, battery health and factory reset in person.', 'Android; storage and model unverified; network lock status unknown', 'Phone only; accessories not confirmed'],
+  ['refurbished-iphone', 'Refurbished Smartphone · iOS', 14999, 'Phones', 'Reused smartphone', 'Refurbished demo · specs illustrative only', 'iOS phone example. A real listing must confirm model, storage, battery health, activation lock removal and ownership before payment.', 'Model/storage unverified; activation-lock status must be checked', 'Phone only; no warranty implied'],
+  ['budget-android-phone', 'Budget Android Smartphone', 4499, 'Phones', 'Reused smartphone', 'Refurbished demo · specs illustrative only', 'Affordable phone example for calls and basic apps. Verify network compatibility, battery, charging port and screen response.', 'Entry-level class; exact model, RAM and storage unverified', 'Phone; charger inclusion must be confirmed'],
+  ['refurbished-android-tablet', 'Refurbished Android Tablet', 6999, 'Tablets', 'Recovered tablet components', 'Refurbished demo · specs illustrative only', 'Tablet example for reading and video calls. Confirm touchscreen zones, speakers, Wi-Fi and battery runtime with the seller.', '10-inch class; model and storage unverified', 'Tablet only'],
+  ['refurbished-ipad', 'Refurbished Tablet · iPad', 11999, 'Tablets', 'Reused tablet', 'Refurbished demo · specs illustrative only', 'Tablet listing example. Ask the seller to remove activation lock and demonstrate charging and touch response before buying.', 'Model, generation and storage unverified; activation lock must be cleared', 'Tablet only; accessories not confirmed'],
+  ['refurbished-wireless-earbuds', 'Refurbished Wireless Earbuds', 999, 'Audio', 'Recovered audio accessories', 'Refurbished demo · hygiene and battery checks needed', 'Earbuds example listing. A real seller should clean replaceable tips, verify both sides, case charging and battery runtime.', 'Bluetooth; runtime and water resistance unverified', 'Earbuds and case; tips/accessories not confirmed'],
+  ['refurbished-wired-earphones', 'Wired Earphones · Tested Example', 299, 'Audio', 'Reused audio accessory', 'Refurbished demo · test both channels', 'Wired earphone example. Confirm both channels, microphone, plug and cable insulation; do not buy if copper is exposed.', '3.5 mm class; microphone and device compatibility to be checked', 'Earphones only'],
+  ['refurbished-monitor-24', 'Refurbished 24-inch Monitor', 4999, 'Displays', 'Recovered monitor components', 'Refurbished demo · electrical inspection required', 'Desktop monitor example. Confirm panel pixels, ports, stand and included power/video cables. The power adapter must be inspected.', '24-inch class; resolution and refresh rate unverified', 'Monitor only; cables to be confirmed'],
+  ['refurbished-keyboard', 'Refurbished USB Keyboard', 499, 'Accessories', 'Tested recovered keyboard', 'Refurbished demo · key test recommended', 'Wired keyboard example. Ask for a full key test and close-up photographs of the cable and keycaps.', 'USB wired; layout and key rollover unverified', 'Keyboard only'],
+  ['refurbished-gaming-mouse', 'Refurbished Gaming Mouse', 799, 'Accessories', 'Recovered gaming accessory', 'Refurbished demo · controls unverified', 'Gaming mouse example with configurable controls. Confirm sensor, scroll wheel, switches and software compatibility.', 'USB; DPI and programmable buttons unverified', 'Mouse only'],
+  ['refurbished-router', 'Refurbished Wi-Fi Router', 899, 'Networking', 'Recovered network device', 'Refurbished demo · reset and security checks needed', 'Router example. Reset to factory settings, update firmware and change default credentials before connecting it to a network.', 'Wi-Fi generation and ISP compatibility unverified', 'Router and power adapter; adapter inspection required'],
+  ['refurbished-camera', 'Refurbished Digital Camera', 7999, 'Cameras', 'Recovered camera body', 'Refurbished demo · shutter and sensor checks needed', 'Camera example. Check sensor, shutter, buttons, lens mount, battery compartment and sample photos before payment.', 'Megapixels, model and shutter count unverified', 'Camera body only; lens/battery status to be confirmed'],
+  ['refurbished-smartwatch', 'Refurbished Smartwatch', 2499, 'Wearables', 'Recovered wearable device', 'Refurbished demo · battery and pairing checks needed', 'Smartwatch example. Check screen, buttons, charging, pairing and account-lock removal. Avoid devices with a swollen battery.', 'Screen size and compatibility unverified; battery health unknown', 'Watch only; charger status to be confirmed'],
+  ['refurbished-game-controller', 'Refurbished Game Controller', 1499, 'Gaming', 'Recovered game controller', 'Refurbished demo · drift test recommended', 'Controller example. Test stick drift, triggers, buttons, wireless pairing and charging before agreeing to buy.', 'Platform compatibility and battery health unverified', 'Controller only'],
+  ['refurbished-power-bank', 'Refurbished Power Bank', 499, 'Power', 'Recovered portable charger', 'Refurbished demo · battery safety inspection required', 'Power bank example. Only use a professionally inspected unit with intact casing; reject swelling, heat, smell or leakage.', 'Capacity and output ratings unverified; inspection required', 'Power bank only; cable not confirmed'],
+  ['refurbished-webcam', 'Refurbished USB Webcam', 999, 'Accessories', 'Recovered camera accessory', 'Refurbished demo · image/microphone test needed', 'Webcam example for online classes. Confirm video, focus, microphone, clip and operating-system compatibility.', 'USB; resolution and microphone quality unverified', 'Webcam and attached cable'],
+];
+
+export const products: Product[] = productRows.map((row, index) => {
+  const [slug, name, priceInr, category, sourceMaterial, conditionNote, description, specLine, includedLine] = row;
+  const sellerName = `PowerCycle Demo Seller ${String(index + 1).padStart(2, '0')}`;
+  const sellerLocation = ['New Delhi, Delhi', 'Mumbai, Maharashtra', 'Bengaluru, Karnataka', 'Pune, Maharashtra', 'Jaipur, Rajasthan'][index % 5];
+  return {
+    slug, name, priceInr, category, sourceMaterial,
+    conditionNote: `${conditionNote}; Seller: ${sellerName} · ${sellerLocation} (demo profile).`,
+    description: `${description} Example specifications: ${specLine}. Included: ${includedLine}.`,
+    isDemo: true as const,
+    imageUrl: photo(productPhotoIds[index]),
+    sellerName,
+    sellerLocation,
+    specifications: specLine.split('; ').map((part, partIndex) => ({ label: ['Key details', 'Condition check', 'Seller note'][Math.min(partIndex, 2)], value: part })),
+    includedItems: includedLine.split('; '),
+  };
+});
+
+export type IdeaStep = { id: string; position: number; title: string; description: string; image: { url: string } };
 export type Idea = {
   slug: string;
   title: string;
   description: string;
   difficulty: 'easy' | 'medium';
   safetyNotes: string;
+  materials: string[];
+  tags: string[];
+  coverImage: { url: string };
+  steps: IdeaStep[];
 };
 
-export const ideas: Idea[] = [
-  ['keyboard-key-art', 'Keyboard-Key Art', 'Arrange retired keys into a word or pattern.', 'easy'],
-  ['cd-decoration', 'CD Decoration', 'Use retired discs as reflective, non-electrical decor.', 'easy'],
-  ['cable-organisation', 'Cable Organisation', 'Bundle loose cables with reclaimed clips and labels.', 'easy'],
-  ['safe-casing-reuse', 'Safe Casing Reuse', 'Turn an empty, inspected plastic casing into storage.', 'easy'],
-  ['educational-kit', 'Educational Learning Kit', 'Create a supervised low-voltage learning collection.', 'medium'],
-  ['desk-organiser', 'Desk Organiser', 'Group retired knobs and cases into a desktop tray.', 'easy'],
-  ['photo-frame', 'Tech Photo Frame', 'Use non-sharp board fragments as frame accents.', 'easy'],
-  ['component-display', 'Component Display', 'Display cleaned, non-powered components in a labeled case.', 'medium'],
-].map(([slug, title, description, difficulty]) => ({
-  slug: slug as string,
-  title: title as string,
-  description: description as string,
-  difficulty: difficulty as 'easy' | 'medium',
-  safetyNotes: 'Do not dismantle batteries, CRT displays, power supplies, or mains-powered devices.',
+const ideaPhotos = [
+  'photo-1513364776144-60967b0f800f', 'photo-1513519245088-0e12902e5a38', 'photo-1518005020951-eccb494ad742',
+  'photo-1581092921461-eab62e97a780', 'photo-1530124566582-a618bc2615dc', 'photo-1528459105426-b9548367069b',
+  'photo-1516321318423-f06f85e504b3', 'photo-1581092160607-ee22621dd758', 'photo-1558618666-fcd25c85cd64',
+  'photo-1532996122724-e3c354a0b15b',
+];
+type IdeaRow = [slug: string, title: string, description: string, difficulty: Idea['difficulty'], materials: string, steps: string, tags: string, caution?: string];
+const ideaRows: IdeaRow[] = [
+  ['keyboard-key-art', 'Keyboard-Key Art', 'Arrange retired keycaps into a name, short quote or geometric wall panel.', 'easy', 'Clean loose keycaps, cardboard backing, picture frame, ruler, craft glue', 'Choose a short design|Arrange the keys dry first|Glue keys onto firm backing|Fit backing into frame|Add hanging hardware and label the material story', 'keyboard,decor,beginner'],
+  ['cd-decoration', 'CD Mosaic Sun Catcher', 'Make a reflective indoor decoration from retired discs without cutting them.', 'easy', 'Retired CDs, cardboard ring, string, blunt scissors, craft glue', 'Inspect discs for cracks|Draw a simple pattern on the ring|Glue whole discs or large intact sections|Let adhesive cure fully|Hang indoors away from heat and direct sun', 'cd,decor,beginner'],
+  ['cable-organisation', 'Reusable Cable Wraps', 'Turn clean fabric offcuts into reusable ties for loose household cables.', 'easy', 'Clean fabric scraps, hook-and-loop dots, ruler, fabric scissors', 'Measure the cable bundle|Cut fabric strips with rounded corners|Fold edges to reduce fraying|Attach hook-and-loop dots|Wrap loosely around unplugged cables', 'cables,organise,beginner'],
+  ['safe-casing-reuse', 'Electronics Casing Desk Tray', 'Repurpose an empty, inspected outer shell into a dry stationery tray.', 'easy', 'Clean empty plastic shell, mild soap, cloth, felt pads, labels', 'Use only an empty casing already separated from electronics|Wash and dry the shell completely|Check edges and cover rough spots|Apply felt pads to the base|Use for dry stationery only', 'plastic,storage,beginner','Never open a device or reuse battery compartments, power supplies or unknown parts.'],
+  ['educational-kit', 'Low-Voltage Learning Board', 'Build a supervised display board from known, safe low-voltage learning components.', 'medium', 'Insulating board, labeled low-voltage modules, reusable fasteners, marker', 'Ask an adult to identify every part|Exclude cells, mains parts and damaged components|Arrange modules without connecting power|Label each component and its purpose|Store the board dry and disconnected', 'learning,electronics,supervised','This is a display and identification activity, not a powered circuit build.'],
+  ['desk-organiser', 'Small Parts Desk Organizer', 'Make a stable holder for paper clips and stationery from cleaned inert components.', 'easy', 'Small clean casing, cardboard dividers, tape, felt pads', 'Select an empty non-electrical container|Measure compartments for stationery|Cut cardboard dividers to size|Fix dividers and add felt feet|Check stability before filling', 'desk,storage,reuse'],
+  ['photo-frame', 'Circuit-Pattern Photo Frame', 'Add a circuit-inspired look to a reused photo frame with printed paper shapes.', 'easy', 'Reused frame, printed circuit pattern, glue stick, scissors', 'Remove the glass and old backing carefully|Print or draw a circuit pattern on paper|Trim paper to fit the frame border|Attach paper without sharp electronic parts|Reassemble and check the glass is secure', 'frame,decor,paper'],
+  ['component-display', 'Labeled Parts Shadow Box', 'Create a non-powered educational display using only known, clean, blunt parts.', 'medium', 'Shadow-box frame, labels, known inert plastic parts, paper backing', 'Use parts identified by a knowledgeable adult|Reject sharp, leaking, powered or battery parts|Plan spacing on paper first|Attach parts behind a clear cover|Add a note that the display is non-functional', 'learning,display,reuse','Do not include capacitors, cells, bulbs, sharp metal or unknown components.'],
+  ['paper-circuit-art', 'Paper Circuit-Inspired Poster', 'Draw a circuit map poster with colored paper paths instead of electrical connections.', 'easy', 'Reused cardboard, colored paper, pencil, ruler, glue stick', 'Flatten a clean piece of reused cardboard|Sketch a simple path and component symbols|Cut paper strips in different colors|Glue down the paths and labels|Add a note that it is artwork, not a working circuit', 'paper,art,beginner'],
+  ['plastic-bottle-planter', 'Self-Watering Bottle Planter', 'Reuse a clean bottle as a small planter with adult help for cutting.', 'easy', 'Clean PET bottle, potting mix, cotton cord, plant, marker', 'Wash and dry the bottle|Ask an adult to cut the bottle safely|Thread cotton cord through the neck|Add soil and a small plant|Keep outdoors or on a waterproof tray and monitor water', 'plastic,garden,beginner','Do not use bottles that held chemicals; an adult must handle cutting.'],
+  ['plastic-bottle-pen-stand', 'Bottle Pen Stand', 'Turn a clean bottle base into a simple stationery cup with a safe finished edge.', 'easy', 'Clean PET bottle, marker, decorative paper, tape, adult help', 'Wash and dry the bottle|Mark the desired cup height|Have an adult cut away from hands|Cover the rim with folded tape or fabric|Decorate and use for pens only', 'plastic,desk,beginner','An adult should cut the bottle; reject any cup with a sharp edge.'],
+  ['plastic-bag-weaving', 'Woven Reusable Plastic Basket', 'Weave clean, dry packaging strips into a small non-food storage basket.', 'medium', 'Clean dry bags, cardboard loom, blunt scissors, tape', 'Use only clean dry packaging|Cut broad strips with adult help|Tape strips to a cardboard loom|Weave over and under without pulling tightly|Fold edges inward and use for dry storage', 'plastic,weaving,storage','Do not use for food, heat, children or heavy items. Avoid thin crinkly bags that tear.'],
+  ['plastic-bottle-self-watering', 'Bottle Drip Watering Helper', 'Make a slow-watering aid from a clean bottle for a potted plant.', 'easy', 'Clean PET bottle, adult helper, potting soil, plant', 'Wash the bottle and remove its label|Ask an adult to make a tiny hole in the cap|Fill with water and secure the cap|Turn upside down into soil without forcing it|Check water flow and plant moisture each day', 'plastic,garden,reuse','Adult supervision is required for any puncture; do not leave standing water indoors.'],
+  ['cardboard-phone-stand', 'Folded Cardboard Phone Stand', 'Cut and fold reused corrugated cardboard into a lightweight phone rest.', 'easy', 'Clean corrugated cardboard, ruler, pencil, scissors, paper tape', 'Trace a wide base and angled back support|Cut cardboard with scissors on a safe surface|Fold along the marked lines|Reinforce the joints with paper tape|Test with an unplugged phone and adjust the angle', 'cardboard,phone,beginner'],
+  ['earphone-external-check', 'Wired Earphone Safe Check', 'Troubleshoot common wired-earphone issues using external checks only.', 'easy', 'Wired earphones, another known-good device, dry cloth', 'Unplug the earphones and inspect the cable for exposed copper|Check the plug and device port for visible debris without inserting tools|Try the earphones on another device at low volume|Test left, right and microphone functions|If the wire is frayed or audio cuts when moved, stop using and replace or use a qualified repairer', 'earphones,repair,safety','Do not splice wires, solder near the ears, or use earphones with exposed conductors.'],
+  ['laptop-slow-safe-check', 'Laptop Running Slowly: Safe Checks', 'Try basic software and airflow checks before considering hardware service.', 'easy', 'Laptop, charger, backup drive or cloud backup, soft dry cloth', 'Save your work and back up important files|Restart and install updates from the official system settings|Close unused apps and check available storage|Place the laptop on a hard surface and clear external vents gently|If it overheats, smells unusual or shuts down, power off and seek repair service', 'laptop,maintenance,beginner','Do not open the laptop or insert objects into its vents.'],
+  ['laptop-charging-check', 'Laptop Not Charging: External Checks', 'Check the charger and charging behavior without opening the computer.', 'easy', 'Laptop, original or compatible rated charger, dry surface', 'Check the wall socket with another safe appliance|Inspect charger cable and plug for cuts, heat marks or looseness|Confirm the charger rating matches the laptop guidance|Shut down, disconnect peripherals and reconnect once|Stop if there is heat, sparking, smell, swelling or a damaged cable and contact a technician', 'laptop,charging,safety','Never open a charger or laptop power circuit.'],
+  ['phone-storage-cleanup', 'Free Space on an Older Phone', 'Recover storage using built-in settings and backed-up files.', 'easy', 'Phone, trusted backup destination, Wi-Fi connection', 'Check storage use in the phone settings|Back up photos and contacts to a trusted location|Remove downloads and duplicate files you recognize|Uninstall apps you no longer use|Restart and confirm enough free space remains', 'phone,maintenance,beginner'],
+  ['phone-port-safe-check', 'Phone Charging Port: Safe Inspection', 'Check charging problems without poking or scraping the port.', 'easy', 'Phone, known-good compatible cable and adapter, flashlight', 'Unplug the phone and let it cool|Look for visible lint, corrosion or damage using a light|Try a known-good compatible cable and adapter|Restart and check the charging indicator|If debris is stuck or the port is loose, stop and visit a repair professional', 'phone,charging,safety','Do not insert metal tools, liquids or cotton swabs into the charging port.'],
+  ['router-reuse-reset', 'Prepare an Old Router for Reuse', 'Reset and securely configure a router before passing it on.', 'medium', 'Router, original power adapter, internet provider instructions', 'Check the casing and adapter for heat or damage|Ask the owner to back up any settings they need|Use the official reset instructions for the exact model|Install current firmware from the maker’s official site|Set a new unique admin password and Wi-Fi password', 'router,network,reuse','Do not connect a device with a damaged adapter or unknown firmware.'],
+  ['mouse-double-click-check', 'Mouse Double-Click Troubleshooting', 'Check settings and connections before deciding a mouse needs repair.', 'easy', 'Mouse, clean dry cloth, another USB port or device', 'Disconnect the mouse|Wipe its exterior with a dry cloth|Reconnect to another port or device|Check pointer and button settings in system settings|If clicks repeat across devices, replace it or ask a repair shop to inspect it', 'mouse,repair,beginner'],
+  ['keyboard-key-clean', 'Clean a Sticky Keyboard Key Safely', 'Clean around a key without removing it or using liquids.', 'easy', 'Device powered off, soft brush, microfiber cloth', 'Shut down and unplug the keyboard or laptop|Turn a separate keyboard gently to release loose crumbs|Brush around the key with a soft dry brush|Wipe the key surface with a dry microfiber cloth|If the key remains stuck, arrange professional cleaning rather than prying it up', 'keyboard,maintenance,safety'],
+  ['monitor-no-signal-check', 'Monitor Says No Signal: Safe Checks', 'Troubleshoot external display connections before seeking repair.', 'easy', 'Monitor, computer, compatible video cable', 'Confirm the monitor and computer are powered on|Check that the cable is firmly seated at both ends|Choose the correct input using the monitor menu|Try a known-good compatible cable or port|If the screen flickers, smells or gets unusually hot, unplug it and seek service', 'monitor,repair,beginner','Do not open a monitor; internal parts can retain dangerous voltage.'],
+  ['tablet-battery-care', 'Care for an Older Tablet Battery', 'Use safer charging habits and watch for battery warning signs.', 'easy', 'Tablet, compatible charger, cool ventilated surface', 'Use a compatible undamaged charger|Charge on a hard surface away from bedding|Avoid heat and direct sunlight while charging|Unplug if the device becomes unusually hot|Stop using a swollen, leaking or damaged tablet and arrange professional service', 'tablet,battery,safety','Never press, puncture or attempt to replace a swollen battery yourself.'],
+  ['old-phone-camera-scanner', 'Reuse an Old Phone as a Document Camera', 'Give a working old phone a low-risk second job for scanning papers.', 'easy', 'Working phone, stable stand, Wi-Fi, scanning app from official store', 'Back up and factory-reset the phone if transferring ownership|Install a trusted document-scanning app from the official store|Place the phone in a stable stand above the page|Use even lighting and keep personal data out of frame|Secure the phone and charger so they cannot fall or overheat', 'phone,creative,reuse'],
+  ['laptop-photo-backup', 'Back Up Files Before Laptop Repair', 'Protect personal files before a repair visit or device handover.', 'easy', 'Laptop, external drive or trusted cloud storage, account recovery details', 'List the folders and files you cannot replace|Back up to an encrypted drive or trusted cloud account|Open several backed-up files to verify the copy|Sign out of sensitive accounts when appropriate|Tell the repair professional what data must be preserved and request consent before any wipe', 'laptop,data,maintenance'],
+  ['charger-cable-check', 'Know When to Replace a Charger Cable', 'Spot visible cable damage and choose a safer replacement.', 'easy', 'Charger and cable unplugged, compatible device, maker specifications', 'Unplug the charger from the wall and device|Look along the full cable for cuts, exposed wires or kinks|Check plugs for looseness, discoloration or melted areas|Do not tape over damage or keep testing a damaged cable|Replace with a correctly rated cable from a reputable source', 'charger,safety,repair','Never open a power adapter or repair mains wiring.'],
+  ['old-phone-desk-clock', 'Turn a Working Phone into a Desk Clock', 'Reuse a supported phone as a simple clock without opening its casing.', 'easy', 'Working phone, stable stand, compatible charger, clock app', 'Back up and remove personal accounts if the phone is being repurposed|Update the operating system and install a trusted clock app|Set the phone on a stable ventilated stand|Use a compatible charger and keep the cable away from walkways|Check temperature during the first hour and unplug if it becomes hot', 'phone,creative,reuse'],
+  ['paper-electronics-gift-tag', 'Circuit-Style Recycled Gift Tags', 'Make gift tags from packaging card decorated with drawn circuit traces.', 'easy', 'Clean packaging cardboard, colored pens, hole punch, string', 'Flatten a clean piece of packaging card|Cut tags to a size that fits the gift|Draw decorative circuit lines and label the device material story|Punch a hole away from the edge|Reuse string and write a personal note on the back', 'paper,craft,gift'],
+  ['e-waste-sort-at-home', 'Sort Small E-Waste Before Drop-Off', 'Prepare household electronics for a verified collection or authorized recycler.', 'easy', 'Small box, labels, tape, device list, local authorized recycler details', 'Separate electronics from household trash|Keep loose batteries apart and cover exposed battery terminals if the recycler instructs|Do not dismantle any device|Remove personal data from working phones and computers|Check accepted items and hours with an authorized local recycler before travel', 'recycling,collection,safety','Follow local recycler instructions; do not put batteries in regular bins.'],
+];
+
+export const ideas: Idea[] = ideaRows.map(([slug, title, description, difficulty, materials, steps, tags, caution], ideaIndex) => ({
+  slug, title, description, difficulty,
+  safetyNotes: caution ?? 'Disconnect power before handling. Stop if you find a damaged battery, exposed conductor, sharp part, heat, unusual smell or liquid damage; get qualified help.',
+  materials: materials.split(', '),
+  tags: tags.split(','),
+  coverImage: { url: photo(ideaPhotos[ideaIndex % ideaPhotos.length], 1200) },
+  steps: steps.split('|').map((text, index) => {
+    const [stepTitle, ...descriptionParts] = text.split(': ');
+    return {
+      id: `${slug}-${index + 1}`,
+      position: index,
+      title: descriptionParts.length ? stepTitle : `Step ${index + 1}`,
+      description: descriptionParts.length ? descriptionParts.join(': ') : text,
+      image: { url: photo(ideaPhotos[(ideaIndex + index + 1) % ideaPhotos.length], 700) },
+    };
+  }),
 }));
