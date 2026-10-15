@@ -12,9 +12,8 @@ const envSchema = z.object({
   SUPABASE_STORAGE_BUCKET: z.string().min(1).default('idea-images'),
   MONGODB_URI: z.string().min(1).optional(),
   MONGODB_DB_NAME: z.string().default('powercycle'),
-  CLOUDFLARE_ACCOUNT_ID: z.string().optional(),
-  CLOUDFLARE_API_TOKEN: z.string().optional(),
-  CLOUDFLARE_AI_MODEL: z.string().default('@cf/qwen/qwen3.8-27b'),
+  GEMINI_API_KEY: z.string().optional(),
+  GEMINI_MODEL: z.string().default('gemini-3.8-flash'),
 });
 
 export const env = envSchema.parse(process.env);

@@ -7,7 +7,7 @@ Deployment has not been verified. Configure provider credentials in the provider
 1. Push the repository to GitHub.
 2. Create a Render Web Service for this monorepo. Set its root directory to `server` if the selected Render build environment can resolve the workspace packages from that root; otherwise keep the repository root and use workspace commands from the root. Confirm the commands against a clean deployment build.
 3. Use `npm install && npm run build` as the build command and `npm start` as the start command.
-4. Configure the variables in `server/.env.example`, including `MONGODB_URI`, Supabase settings, `CLIENT_ORIGIN`, optional `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`, `SUPABASE_SERVICE_ROLE_KEY`, and `SUPABASE_STORAGE_BUCKET`.
+4. Configure the variables in `server/.env.example`, including `MONGODB_URI`, Supabase settings, `CLIENT_ORIGIN`, optional `GEMINI_API_KEY` and `GEMINI_MODEL`, `SUPABASE_SERVICE_ROLE_KEY`, and `SUPABASE_STORAGE_BUCKET`.
 5. Verify `GET /api/v1/health` and then run the seed command with a configured `MONGODB_URI`.
 
 ## Frontend (Vercel)
@@ -33,13 +33,13 @@ Community sellers can publish listings, buyers can submit a manual request-to-bu
 - Set `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and server-only `SUPABASE_SERVICE_ROLE_KEY` in Render.
 - Set `CLIENT_ORIGIN` to the exact Vercel production origin and configure that origin in Supabase Auth redirect URLs.
 - Add a Vercel SPA rewrite for `/(.*)` to `/index.html` so direct app routes work after refresh.
-- Configure `CLOUDFLARE_ACCOUNT_ID` and a server-side `CLOUDFLARE_API_TOKEN` created from Workers AI → Use REST API (or with `Workers AI - Read` and `Workers AI - Edit` permissions) if photo analysis and generated repair plans are enabled. The model defaults to `@cf/meta/llama-3.2-11b-vision-instruct`. Accept the model's license in Cloudflare before use.
+- Configure `GEMINI_API_KEY` as a server-side Render environment variable if photo analysis and generated repair plans are enabled. `GEMINI_MODEL` defaults to `gemini-3.8-flash`. Never put the key in a `VITE_` variable or client bundle.
 
 ## Required verification after credentials are available
 
 - Configure Supabase access-token verification before enabling protected writes.
 - Confirm MongoDB ownership queries with two separate users.
-- Configure Cloudflare Workers AI server-side only and test success, quota failure, malformed output, and timeout fallback.
+- Configure Gemini server-side only and test success, quota failure, malformed output, and timeout fallback.
 - Test CORS with the actual Vercel origin.
 - Run the final private-window smoke test from the master specification.
 
